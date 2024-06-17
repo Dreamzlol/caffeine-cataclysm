@@ -1,10 +1,6 @@
 local Unlocker, Caffeine, Rotation = ...
 
 -- Loader
-if Caffeine.GetSpec() ~= 2 then
-	return
-end
-
 if Caffeine.GetClass() ~= "MAGE" then
 	return
 end

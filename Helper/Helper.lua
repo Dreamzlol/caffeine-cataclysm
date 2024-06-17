@@ -7,26 +7,6 @@ local Target = Caffeine.UnitManager:Get("target")
 -- Spells
 local spells = Rotation.Spells
 
--- Gets the index of the talent tree with the most points of the most invested talent tree
----@return number talentIndex
-function Caffeine.GetSpec()
-	local talentIndex = 0
-	local talentPoints = 0
-
-	-- Loop through talent trees
-	for i = 1, 3 do
-		local _, _, pointsSpent = GetTalentTabInfo(i)
-
-		-- Update if current tree has more points
-		if pointsSpent > talentPoints then
-			talentIndex = i
-			talentPoints = pointsSpent
-		end
-	end
-
-	return talentIndex
-end
-
 -- Determine the class of the player
 ---@return string className
 function Caffeine.GetClass()
