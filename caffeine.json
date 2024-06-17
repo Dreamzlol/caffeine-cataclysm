@@ -1,0 +1,9 @@
+{
+  "order": [
+    "Helper/Helper",
+    "Interface/Fire",
+    "Spells/Fire",
+    "Items/Fire",
+    "Rotations/Fire"
+  ]
+}
