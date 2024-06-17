@@ -17,53 +17,6 @@ end
 --- Determines if a unit is a boss
 ---@return boolean isBoss
 function Caffeine.Unit:CustomIsBoss()
-	local id = ObjectID(self:GetOMToken())
-
-	-- Lady Deathwhisper
-	if id == 36855 then
-		return true
-	end
-
-	-- Sindragossa
-	if id == 36853 then
-		return true
-	end
-
-	-- Professor Putricide
-	if id == 36678 then
-		return true
-	end
-
-	-- Skybreaker Sorcerer
-	if id == 37116 then
-		return true
-	end
-
-	-- Kor'kron Battle Mage
-	if id == 37117 then
-		return true
-	end
-
-	-- Blazing Skeleton
-	if id == 36791 then
-		return true
-	end
-
-	-- Savalana Ragefire
-	if id == 39747 then
-		return true
-	end
-
-	-- Baltharus the Warborn
-	if id == 39751 then
-		return true
-	end
-
-	-- General Zarithrian
-	if id == 39746 then
-		return true
-	end
-
 	-- Raid Boss
 	if self:IsBoss() then
 		return true
@@ -71,7 +24,7 @@ function Caffeine.Unit:CustomIsBoss()
 
 	-- Dungeon Boss
 	if Player:GetInstanceInfo("party", 2) then
-		if UnitClassification(self:GetOMToken()) == "elite" and UnitLevel(self:GetOMToken()) == 82 then
+		if UnitClassification(self:GetOMToken()) == "elite" and (UnitLevel(self:GetOMToken()) == 81 or UnitLevel(self:GetOMToken()) == 82) then
 			return true
 		end
 	end
