@@ -208,24 +208,24 @@ PreCombatAPL:AddSpell(spells.moltenArmor
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
 			and not Player:IsAffectingCombat()
-			and
-			(not Player:GetAuras():FindMy(spells.moltenArmor):IsUp() or Player:GetAuras():FindMy(spells.moltenArmor):GetRemainingTime() < 600)
+			and (not Player:GetAuras():FindMy(spells.moltenArmor):IsUp() or Player:GetAuras()
+				:FindMy(spells.moltenArmor)
+				:GetRemainingTime() < 600)
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Player)
-)
+	:SetTarget(Player))
 
 -- Arcane Brillance
 PreCombatAPL:AddSpell(spells.arcaneBrillance
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
 			and not Player:IsAffectingCombat()
-			and
-			(not Player:GetAuras():FindMy(spells.arcaneBrillanceAura):IsUp() or Player:GetAuras():FindMy(spells.arcaneBrillanceAura):GetRemainingTime() < 600)
+			and (not Player:GetAuras():FindMy(spells.arcaneBrillanceAura):IsUp() or Player:GetAuras()
+				:FindMy(spells.arcaneBrillanceAura)
+				:GetRemainingTime() < 600)
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Player)
-)
+	:SetTarget(Player))
 
 -- Conjure Mana Gem
 PreCombatAPL:AddSpell(spells.conjureManaGem
@@ -236,8 +236,7 @@ PreCombatAPL:AddSpell(spells.conjureManaGem
 			and not Player:IsCastingOrChanneling()
 			and not Player:IsMoving()
 	end)
-	:SetTarget(Player)
-)
+	:SetTarget(Player))
 
 -- Healthstone
 DefaultAPL:AddItem(items.healthstone1
@@ -249,8 +248,7 @@ DefaultAPL:AddItem(items.healthstone1
 			and not Player:IsCastingOrChanneling()
 			and not Player:IsMoving()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
 -- Healthstone
 DefaultAPL:AddItem(items.healthstone2
@@ -262,8 +260,7 @@ DefaultAPL:AddItem(items.healthstone2
 			and not Player:IsCastingOrChanneling()
 			and not Player:IsMoving()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
 -- Healthstone
 DefaultAPL:AddItem(items.healthstone3
@@ -275,8 +272,7 @@ DefaultAPL:AddItem(items.healthstone3
 			and not Player:IsCastingOrChanneling()
 			and not Player:IsMoving()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
 -- Beserking
 DefaultAPL:AddSpell(spells.beserking
@@ -289,8 +285,7 @@ DefaultAPL:AddSpell(spells.beserking
 			and not Player:IsMoving()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
 -- Engineering Gloves
 DefaultAPL:AddItem(items.inventorySlotGloves
@@ -305,8 +300,7 @@ DefaultAPL:AddItem(items.inventorySlotGloves
 			and not Player:IsMoving()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
 -- Mirror Image
 DefaultAPL:AddSpell(spells.mirrorImage
@@ -319,8 +313,7 @@ DefaultAPL:AddSpell(spells.mirrorImage
 			and not Player:IsMoving()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
 -- Molten Armor
 DefaultAPL:AddSpell(spells.moltenArmor
@@ -330,8 +323,7 @@ DefaultAPL:AddSpell(spells.moltenArmor
 			and not Player:GetAuras():FindMy(spells.moltenArmor):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Player)
-)
+	:SetTarget(Player))
 
 -- Combustion (Auras)
 DefaultAPL:AddSpell(spells.combustion
@@ -344,14 +336,15 @@ DefaultAPL:AddSpell(spells.combustion
 			and Target:CustomIsBoss()
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras()
+				:FindMy(spells.pyroblastAura2)
+				:IsUp())
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.combustion:GetIcon(), "Combustion")
-	end)
-)
+	end))
 
 -- Pyro Blast (Hot Streak)
 DefaultAPL:AddSpell(spells.pyroblast
@@ -368,8 +361,7 @@ DefaultAPL:AddSpell(spells.pyroblast
 	:SetTarget(Target)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.pyroblast:GetIcon(), "Pyro Blast")
-	end)
-)
+	end))
 
 -- Living Bomb
 DefaultAPL:AddSpell(spells.livingBomb
@@ -382,25 +374,7 @@ DefaultAPL:AddSpell(spells.livingBomb
 			and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Target)
-)
-
--- Spellsteal
-DefaultAPL:AddSpell(spells.spellsteal
-	:CastableIf(function(self)
-		local useSpellsteal = Rotation.Config:Read("spellsteal", true)
-		return self:IsKnownAndUsable()
-			and self:IsInRange(Spellsteal)
-			and useSpellsteal
-			and Spellsteal:Exists()
-			and Spellsteal:GetAuras():HasAnyStealableAura()
-			and not Player:IsCastingOrChanneling()
-	end)
-	:SetTarget(Spellsteal)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.spellsteal:GetIcon(), "Spellsteal")
-	end)
-)
+	:SetTarget(Target))
 
 -- Flame Orb (Boss)
 DefaultAPL:AddSpell(spells.flameOrb
@@ -415,8 +389,7 @@ DefaultAPL:AddSpell(spells.flameOrb
 	:SetTarget(None)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.flameOrb:GetIcon(), "Flame Orb (Boss)")
-	end)
-)
+	end))
 
 -- Fire Blast (Spreading Dots)
 DefaultAPL:AddSpell(spells.fireBlast
@@ -437,8 +410,39 @@ DefaultAPL:AddSpell(spells.fireBlast
 	:SetTarget(Target)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Spreading Dots)")
+	end))
+
+-- Remove Curse
+DefaultAPL:AddSpell(spells.removeCurse
+	:CastableIf(function(self)
+		local useDecurse = Rotation.Config:Read("decurse", true)
+		return self:IsKnownAndUsable()
+			and self:IsInRange(Decurse)
+			and useDecurse
+			and Decurse:Exists()
+			and Decurse:GetAuras():HasAnyDispelableAura(spells.removeCurse)
+			and not Player:IsCastingOrChanneling()
 	end)
-)
+	:SetTarget(Decurse)
+	:OnCast(function()
+		Caffeine.Notifications:AddNotification(spells.removeCurse:GetIcon(), "Remove Curse")
+	end))
+
+-- Spellsteal
+DefaultAPL:AddSpell(spells.spellsteal
+	:CastableIf(function(self)
+		local useSpellsteal = Rotation.Config:Read("spellsteal", true)
+		return self:IsKnownAndUsable()
+			and self:IsInRange(Spellsteal)
+			and useSpellsteal
+			and Spellsteal:Exists()
+			and Spellsteal:GetAuras():HasAnyStealableAura()
+			and not Player:IsCastingOrChanneling()
+	end)
+	:SetTarget(Spellsteal)
+	:OnCast(function()
+		Caffeine.Notifications:AddNotification(spells.spellsteal:GetIcon(), "Spellsteal")
+	end))
 
 -- Dragon's Breath
 DefaultAPL:AddSpell(spells.dragonsBreath
@@ -450,10 +454,9 @@ DefaultAPL:AddSpell(spells.dragonsBreath
 			and Player:GetEnemies(8) >= 2
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
--- Flame Orb (Aoe)
+-- Flame Orb (AoE)
 DefaultAPL:AddSpell(spells.flameOrb
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
@@ -466,8 +469,7 @@ DefaultAPL:AddSpell(spells.flameOrb
 	:SetTarget(None)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.flameOrb:GetIcon(), "Flame Orb (AoE)")
-	end)
-)
+	end))
 
 -- Blast Wave
 DefaultAPL:AddSpell(spells.blastWave
@@ -482,8 +484,7 @@ DefaultAPL:AddSpell(spells.blastWave
 	:OnCast(function(self)
 		local position = Target:GetPosition()
 		self:Click(position)
-	end)
-)
+	end))
 
 -- Flamestrike
 DefaultAPL:AddSpell(spells.flamestrike
@@ -499,8 +500,7 @@ DefaultAPL:AddSpell(spells.flamestrike
 	:OnCast(function(self)
 		local position = Target:GetPosition()
 		self:Click(position)
-	end)
-)
+	end))
 
 -- Living Bomb (AoE)
 DefaultAPL:AddSpell(spells.livingBomb
@@ -514,8 +514,7 @@ DefaultAPL:AddSpell(spells.livingBomb
 			and LivingBomb:CustomTimeToDie() > 12
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(LivingBomb)
-)
+	:SetTarget(LivingBomb))
 
 -- Mana Gem
 DefaultAPL:AddItem(items.manaGem
@@ -527,8 +526,7 @@ DefaultAPL:AddItem(items.manaGem
 			and Player:IsAffectingCombat()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-)
+	:SetTarget(None))
 
 -- Mage Armor
 DefaultAPL:AddSpell(spells.mageArmor
@@ -538,23 +536,7 @@ DefaultAPL:AddSpell(spells.mageArmor
 			and not Player:GetAuras():FindMy(spells.mageArmor):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Player)
-)
-
--- Fire Ball
-DefaultAPL:AddSpell(spells.fireball
-	:CastableIf(function(self)
-		return self:IsKnownAndUsable()
-			and self:IsInRange(Target)
-			and Target:Exists()
-			and Target:IsHostile()
-			and Player:CanSee(Target)
-			and Player:IsFacing(Target)
-			and not Player:IsMoving()
-			and not Player:IsCastingOrChanneling()
-	end)
-	:SetTarget(Target)
-)
+	:SetTarget(Player))
 
 -- Fire Blast (Moving)
 DefaultAPL:AddSpell(spells.fireBlast
@@ -570,7 +552,23 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target)
-)
+	:OnCast(function()
+		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Moving)")
+	end))
+
+-- Fire Ball
+DefaultAPL:AddSpell(spells.fireball
+	:CastableIf(function(self)
+		return self:IsKnownAndUsable()
+			and self:IsInRange(Target)
+			and Target:Exists()
+			and Target:IsHostile()
+			and Player:CanSee(Target)
+			and Player:IsFacing(Target)
+			and not Player:IsMoving()
+			and not Player:IsCastingOrChanneling()
+	end)
+	:SetTarget(Target))
 
 -- Scorch
 DefaultAPL:AddSpell(spells.scorch
@@ -584,17 +582,18 @@ DefaultAPL:AddSpell(spells.scorch
 			and Player:IsMoving()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Target)
-)
+	:SetTarget(Target))
 
 -- Sync
 Module:Sync(function()
-	if Player:IsDead()
+	if
+		Player:IsDead()
 		or IsMounted()
 		or UnitInVehicle("player")
 		or Player:GetAuras():FindAnyOfMy(spells.refreshmentAuras):IsUp()
 		or Player:GetAuras():FindAny(spells.invisibilityAura):IsUp()
-		or blacklistUnitById[Target:GetID()] then
+		or blacklistUnitById[Target:GetID()]
+	then
 		return false
 	end
 

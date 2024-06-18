@@ -12,14 +12,15 @@ Rotation.Category = Caffeine.Interface.Category:New("|cffffffffDreams|cff00B5FFS
 Rotation.Config = Rotation.Category.config
 
 -- Initialize the Hotbar Toggle too false
-Rotation.Config:Write("aoe", false)
 Rotation.Config:Write("autoTarget", false)
 Rotation.Config:Write("decurse", false)
 Rotation.Config:Write("spellsteal", false)
 
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Mage: Fire (Cataclysm) successfully loaded! Yeeey! :)")
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.1.5")
-Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!")
+Caffeine:Print(
+	"Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!"
+)
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Discord Link: |cffeb6ee9https://discord.gg/Pm4wQpMDKh")
 
 -- Hotbar
@@ -44,25 +45,6 @@ Hotbar:AddButton({
 			else
 				Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Fire Disabled")
 			end
-		end
-	end,
-})
-
--- AoE
-Hotbar:AddButton({
-	name = "Toggle AoE",
-	texture = "Interface\\ICONS\\Ability_Mage_LivingBomb",
-	tooltip = "Activates Living Bomb for non-targeted enemies nearby.",
-	toggle = true,
-	onClick = function()
-		local getSetting = Rotation.Config:Read("aoe", false)
-		local setting = not getSetting
-		Rotation.Config:Write("aoe", setting)
-
-		if setting then
-			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - AoE Enabled")
-		else
-			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - AoE Disabled")
 		end
 	end,
 })
