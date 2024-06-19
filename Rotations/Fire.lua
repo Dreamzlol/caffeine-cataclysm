@@ -319,7 +319,7 @@ DefaultAPL:AddSpell(spells.mirrorImage
 DefaultAPL:AddSpell(spells.moltenArmor
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-			and Player:GetPP() >= 25
+			and Player:GetPP() > 25
 			and not Player:GetAuras():FindMy(spells.moltenArmor):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
@@ -336,9 +336,7 @@ DefaultAPL:AddSpell(spells.combustion
 			and Target:CustomIsBoss()
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras()
-				:FindMy(spells.pyroblastAura2)
-				:IsUp())
+			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target)
@@ -368,7 +366,8 @@ DefaultAPL:AddSpell(spells.livingBomb
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
 			and self:IsInRange(Target)
-			and Target:Exists()
+            and Target:Exists()
+			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and Target:CustomTimeToDie() > 12
 			and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
@@ -380,7 +379,8 @@ DefaultAPL:AddSpell(spells.livingBomb
 DefaultAPL:AddSpell(spells.flameOrb
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-			and Target:Exists()
+            and Target:Exists()
+			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and (Target:CustomIsBoss() or Target:IsDummy())
 			and spells.combustion:OnCooldown()
@@ -401,8 +401,8 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and Player:CanSee(Target)
 			and Player:IsFacing(Target)
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
-			and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			-- and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+			-- and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
+			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
 			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
 			and Target:GetEnemies(12) >= 2
 			and not Player:IsCastingOrChanneling()
@@ -435,7 +435,9 @@ DefaultAPL:AddSpell(spells.spellsteal
 		return self:IsKnownAndUsable()
 			and self:IsInRange(Spellsteal)
 			and useSpellsteal
-			and Spellsteal:Exists()
+            and Spellsteal:Exists()
+            and Spellsteal:IsHostile()
+			and Spellsteal:CanSee(Player)
 			and Spellsteal:GetAuras():HasAnyStealableAura()
 			and not Player:IsCastingOrChanneling()
 	end)
@@ -460,8 +462,9 @@ DefaultAPL:AddSpell(spells.dragonsBreath
 DefaultAPL:AddSpell(spells.flameOrb
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-			and Target:Exists()
-			and Player:CanSee(Target)
+            and Target:Exists()
+			and Target:IsHostile()
+            and Player:CanSee(Target)
 			and Player:IsFacing(Target)
 			and Target:GetEnemies(12) >= 3
 			and not Player:IsCastingOrChanneling()
@@ -490,10 +493,12 @@ DefaultAPL:AddSpell(spells.blastWave
 DefaultAPL:AddSpell(spells.flamestrike
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-			and Target:Exists()
+            and Target:Exists()
+			and Target:IsHostile()
+            and Player:CanSee(Target)
+			and Target:GetEnemies(12) >= 2
 			and Player:GetDistance(Target) <= 36
 			and spells.flamestrike:GetTimeSinceLastCast() > 8
-			and Target:GetEnemies(12) >= 2
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(None)
@@ -505,10 +510,8 @@ DefaultAPL:AddSpell(spells.flamestrike
 -- Living Bomb (AoE)
 DefaultAPL:AddSpell(spells.livingBomb
 	:CastableIf(function(self)
-		local useAoe = Rotation.Config:Read("aoe", true)
 		return self:IsKnownAndUsable()
 			and self:IsInRange(LivingBomb)
-			and useAoe
 			and LivingBomb:Exists()
 			and LivingBomb:IsHostile()
 			and LivingBomb:CustomTimeToDie() > 12
@@ -553,7 +556,7 @@ DefaultAPL:AddSpell(spells.fireBlast
 	end)
 	:SetTarget(Target)
 	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Moving)")
+		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Movement)")
 	end))
 
 -- Fire Ball

@@ -28,7 +28,8 @@ function Caffeine.Unit:CustomIsBoss()
 			and (UnitLevel(self:GetOMToken()) == 81
 				or UnitLevel(self:GetOMToken()) == 82
 				or UnitLevel(self:GetOMToken()) == 83
-				or UnitLevel(self:GetOMToken()) == 84
+                or UnitLevel(self:GetOMToken()) == 84
+				or UnitLevel(self:GetOMToken()) == 87
 				or self:IsBoss()) then
 			return true
 		end
