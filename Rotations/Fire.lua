@@ -73,7 +73,7 @@ local HighestHPEnemie = Caffeine.UnitManager:CreateCustomUnit("highest", functio
 		end
 
 		local hp = unit:GetHP()
-		if hp > highestHP then -- Change this line to check for higher HP
+		if hp > highestHP then
 			highest = unit
 			highestHP = hp
 		end
@@ -336,7 +336,9 @@ DefaultAPL:AddSpell(spells.combustion
 			and Target:CustomIsBoss()
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras()
+				:FindMy(spells.pyroblastAura2)
+				:IsUp())
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target)
@@ -366,7 +368,7 @@ DefaultAPL:AddSpell(spells.livingBomb
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
 			and self:IsInRange(Target)
-            and Target:Exists()
+			and Target:Exists()
 			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and Target:CustomTimeToDie() > 12
@@ -379,7 +381,7 @@ DefaultAPL:AddSpell(spells.livingBomb
 DefaultAPL:AddSpell(spells.flameOrb
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-            and Target:Exists()
+			and Target:Exists()
 			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and (Target:CustomIsBoss() or Target:IsDummy())
@@ -402,7 +404,9 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and Player:IsFacing(Target)
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
 			-- and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras()
+				:FindMy(spells.pyroblastAura2)
+				:IsUp())
 			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
 			and Target:GetEnemies(12) >= 2
 			and not Player:IsCastingOrChanneling()
@@ -435,8 +439,8 @@ DefaultAPL:AddSpell(spells.spellsteal
 		return self:IsKnownAndUsable()
 			and self:IsInRange(Spellsteal)
 			and useSpellsteal
-            and Spellsteal:Exists()
-            and Spellsteal:IsHostile()
+			and Spellsteal:Exists()
+			and Spellsteal:IsHostile()
 			and Spellsteal:CanSee(Player)
 			and Spellsteal:GetAuras():HasAnyStealableAura()
 			and not Player:IsCastingOrChanneling()
@@ -462,9 +466,9 @@ DefaultAPL:AddSpell(spells.dragonsBreath
 DefaultAPL:AddSpell(spells.flameOrb
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-            and Target:Exists()
+			and Target:Exists()
 			and Target:IsHostile()
-            and Player:CanSee(Target)
+			and Player:CanSee(Target)
 			and Player:IsFacing(Target)
 			and Target:GetEnemies(12) >= 3
 			and not Player:IsCastingOrChanneling()
@@ -493,9 +497,9 @@ DefaultAPL:AddSpell(spells.blastWave
 DefaultAPL:AddSpell(spells.flamestrike
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-            and Target:Exists()
+			and Target:Exists()
 			and Target:IsHostile()
-            and Player:CanSee(Target)
+			and Player:CanSee(Target)
 			and Target:GetEnemies(12) >= 2
 			and Player:GetDistance(Target) <= 36
 			and spells.flamestrike:GetTimeSinceLastCast() > 8

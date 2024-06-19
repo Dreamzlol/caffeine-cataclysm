@@ -24,13 +24,17 @@ function Caffeine.Unit:CustomIsBoss()
 
 	-- Dungeon Boss
 	if Player:GetInstanceInfo("party", 2) then
-		if UnitClassification(self:GetOMToken()) == "elite"
-			and (UnitLevel(self:GetOMToken()) == 81
+		if
+			UnitClassification(self:GetOMToken()) == "elite"
+			and (
+				UnitLevel(self:GetOMToken()) == 81
 				or UnitLevel(self:GetOMToken()) == 82
 				or UnitLevel(self:GetOMToken()) == 83
-                or UnitLevel(self:GetOMToken()) == 84
+				or UnitLevel(self:GetOMToken()) == 84
 				or UnitLevel(self:GetOMToken()) == 87
-				or self:IsBoss()) then
+				or self:IsBoss()
+			)
+		then
 			return true
 		end
 	end
@@ -146,7 +150,13 @@ local function GetDrawingEnemies()
 	local drawEnemies = {}
 
 	Caffeine.UnitManager:EnumEnemies(function(unit)
-		if unit and unit:Exists() and not unit:IsDead() and Player:GetDistance(unit) <= 40 and drawEnemiesIDs[unit:GetID()] then
+		if
+			unit
+			and unit:Exists()
+			and not unit:IsDead()
+			and Player:GetDistance(unit) <= 40
+			and drawEnemiesIDs[unit:GetID()]
+		then
 			table.insert(drawEnemies, unit)
 		end
 	end)
