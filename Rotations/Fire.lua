@@ -363,6 +363,25 @@ DefaultAPL:AddSpell(spells.pyroblast
 		Caffeine.Notifications:AddNotification(spells.pyroblast:GetIcon(), "Pyro Blast")
 	end))
 
+-- Fire Blast (Spreading Dots)
+DefaultAPL:AddSpell(spells.fireBlast
+	:CastableIf(function(self)
+		return self:IsKnownAndUsable()
+			and self:IsInRange(Target)
+			and Target:Exists()
+			and Target:IsHostile()
+			and Player:CanSee(Target)
+			and Player:IsFacing(Target)
+			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
+			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
+			and Target:GetEnemies(12) >= 2
+			and not Player:IsCastingOrChanneling()
+	end)
+	:SetTarget(Target)
+	:OnCast(function()
+		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Spreading Dots)")
+	end))
+
 -- Living Bomb
 DefaultAPL:AddSpell(spells.livingBomb
 	:CastableIf(function(self)
@@ -391,29 +410,6 @@ DefaultAPL:AddSpell(spells.flameOrb
 	:SetTarget(None)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.flameOrb:GetIcon(), "Flame Orb (Boss)")
-	end))
-
--- Fire Blast (Spreading Dots)
-DefaultAPL:AddSpell(spells.fireBlast
-	:CastableIf(function(self)
-		return self:IsKnownAndUsable()
-			and self:IsInRange(Target)
-			and Target:Exists()
-			and Target:IsHostile()
-			and Player:CanSee(Target)
-			and Player:IsFacing(Target)
-			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
-			-- and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras()
-				:FindMy(spells.pyroblastAura2)
-				:IsUp())
-			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
-			and Target:GetEnemies(12) >= 2
-			and not Player:IsCastingOrChanneling()
-	end)
-	:SetTarget(Target)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Spreading Dots)")
 	end))
 
 -- Remove Curse
