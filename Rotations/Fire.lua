@@ -39,6 +39,10 @@ local blacklistUnitById = {
 	[39190] = true, -- Wicked Spirit: 39190
 }
 
+local blacklistUnitByAura = {
+	[75683] = true, -- Waterspout
+}
+
 local HighestHPEnemie = Caffeine.UnitManager:CreateCustomUnit("highest", function(unit)
 	local highest = nil
 	local highestHP = 0
@@ -120,6 +124,10 @@ local LivingBomb = Caffeine.UnitManager:CreateCustomUnit("livingBomb", function(
 		end
 
 		if blacklistUnitById[unit:GetID()] then
+			return false
+		end
+
+		if unit:GetAuras():FindMy(blacklistUnitByAura):IsUp() then
 			return false
 		end
 
@@ -336,9 +344,7 @@ DefaultAPL:AddSpell(spells.combustion
 			and Target:CustomIsBoss()
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras()
-				:FindMy(spells.pyroblastAura2)
-				:IsUp())
+			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target)
@@ -360,8 +366,22 @@ DefaultAPL:AddSpell(spells.pyroblast
 	end)
 	:SetTarget(Target)
 	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.pyroblast:GetIcon(), "Pyro Blast")
+		Caffeine.Notifications:AddNotification(spells.pyroblast:GetIcon(), "Pyro Blast (Hot Streak)")
 	end))
+
+-- Living Bomb
+DefaultAPL:AddSpell(spells.livingBomb
+	:CastableIf(function(self)
+		return self:IsKnownAndUsable()
+			and self:IsInRange(Target)
+			and Target:Exists()
+			and Target:IsHostile()
+			and Player:CanSee(Target)
+			and Target:CustomTimeToDie() > 12
+			and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
+			and not Player:IsCastingOrChanneling()
+	end)
+	:SetTarget(Target))
 
 -- Fire Blast (Spreading Dots)
 DefaultAPL:AddSpell(spells.fireBlast
@@ -382,19 +402,24 @@ DefaultAPL:AddSpell(spells.fireBlast
 		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Spreading Dots)")
 	end))
 
--- Living Bomb
-DefaultAPL:AddSpell(spells.livingBomb
+-- Pyro Blast (Opener)
+DefaultAPL:AddSpell(spells.pyroblast
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
 			and self:IsInRange(Target)
 			and Target:Exists()
 			and Target:IsHostile()
 			and Player:CanSee(Target)
-			and Target:CustomTimeToDie() > 12
-			and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
+			and Target:CustomIsBoss()
+			and Target:GetHP() > 95
+			and self:GetTimeSinceLastCast() > 5
+			and not (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Target))
+	:SetTarget(Target)
+	:OnCast(function()
+		Caffeine.Notifications:AddNotification(spells.pyroblast:GetIcon(), "Pyro Blast (Opener)")
+	end))
 
 -- Flame Orb (Boss)
 DefaultAPL:AddSpell(spells.flameOrb
