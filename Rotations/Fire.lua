@@ -127,10 +127,6 @@ local LivingBomb = Caffeine.UnitManager:CreateCustomUnit("livingBomb", function(
 			return false
 		end
 
-		if unit:GetAuras():FindAny(blacklistUnitByAura):IsUp() then
-			return false
-		end
-
 		if unit:GetAuras():FindMy(spells.livingBomb):IsUp() then
 			livingBombCount = livingBombCount + 1
 		elseif not unit:IsDead() and unit:IsEnemy() and unit:IsHostile() and Player:CanSee(unit) then
@@ -282,6 +278,27 @@ DefaultAPL:AddItem(items.healthstone3
 	end)
 	:SetTarget(None))
 
+-- Saronite Bomb
+DefaultAPL:AddItem(items.saroniteBomb
+	:UsableIf(function(self)
+		local useSaroniteBomb = Rotation.Config:Read("items_saroniteBomb", true)
+		return self:IsUsable()
+			and not self:IsOnCooldown()
+			and useSaroniteBomb
+			and Target:Exists()
+			and Target:IsHostile()
+			and Player:CanSee(Target)
+			and Target:CustomIsBoss()
+			and Player:GetDistance(Target) <= 29
+			and not Target:IsMoving()
+			and not Player:IsCastingOrChanneling()
+	end)
+	:SetTarget(None)
+	:OnUse(function(self)
+		local targetPosition = Target:GetPosition()
+		self:Click(targetPosition)
+	end))
+
 -- Beserking
 DefaultAPL:AddSpell(spells.beserking
 	:CastableIf(function(self)
@@ -378,8 +395,7 @@ DefaultAPL:AddSpell(spells.livingBomb
 			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and Target:CustomTimeToDie() > 12
-            and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
-			and not Target:GetAuras():FindAny(blacklistUnitByAura):IsUp()
+			and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target))

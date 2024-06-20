@@ -21,4 +21,5 @@ Rotation.Items = {
 	healthstone1 = ItemBook:GetItem(36892),
 	healthstone2 = ItemBook:GetItem(36893),
 	healthstone3 = ItemBook:GetItem(36894),
+	saroniteBomb = ItemBook:GetItem(41119),
 }
