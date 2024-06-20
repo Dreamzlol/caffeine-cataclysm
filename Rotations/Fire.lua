@@ -39,10 +39,6 @@ local blacklistUnitById = {
 	[39190] = true, -- Wicked Spirit: 39190
 }
 
-local blacklistUnitByAura = {
-	[75683] = true, -- Waterspout
-}
-
 local HighestHPEnemie = Caffeine.UnitManager:CreateCustomUnit("highest", function(unit)
 	local highest = nil
 	local highestHP = 0
@@ -124,6 +120,10 @@ local LivingBomb = Caffeine.UnitManager:CreateCustomUnit("livingBomb", function(
 		end
 
 		if blacklistUnitById[unit:GetID()] then
+			return false
+		end
+
+		if unit:GetAuras():FindAny(spells.waterspoutAura):IsUp() then
 			return false
 		end
 
@@ -372,6 +372,7 @@ DefaultAPL:AddSpell(spells.livingBomb
 			and Player:CanSee(Target)
 			and Target:CustomTimeToDie() > 12
 			and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
+			and not Target:GetAuras():FindAny(spells.waterspoutAura):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target))
