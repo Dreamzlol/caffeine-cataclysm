@@ -378,7 +378,8 @@ DefaultAPL:AddSpell(spells.livingBomb
 			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and Target:CustomTimeToDie() > 12
-			and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
+            and not Target:GetAuras():FindMy(spells.livingBomb):IsUp()
+			and not Target:GetAuras():FindAny(blacklistUnitByAura):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target))
