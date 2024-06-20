@@ -243,31 +243,7 @@ PreCombatAPL:AddSpell(spells.conjureManaGem
 	:SetTarget(Player))
 
 -- Healthstone
-DefaultAPL:AddItem(items.healthstone1
-	:UsableIf(function(self)
-		return self:IsUsable()
-			and not self:IsOnCooldown()
-			and Player:GetHP() < Rotation.Config:Read("items_healthStone", 20)
-			and Player:IsAffectingCombat()
-			and not Player:IsCastingOrChanneling()
-			and not Player:IsMoving()
-	end)
-	:SetTarget(None))
-
--- Healthstone
-DefaultAPL:AddItem(items.healthstone2
-	:UsableIf(function(self)
-		return self:IsUsable()
-			and not self:IsOnCooldown()
-			and Player:GetHP() < Rotation.Config:Read("items_healthStone", 20)
-			and Player:IsAffectingCombat()
-			and not Player:IsCastingOrChanneling()
-			and not Player:IsMoving()
-	end)
-	:SetTarget(None))
-
--- Healthstone
-DefaultAPL:AddItem(items.healthstone3
+DefaultAPL:AddItem(items.healthstone
 	:UsableIf(function(self)
 		return self:IsUsable()
 			and not self:IsOnCooldown()

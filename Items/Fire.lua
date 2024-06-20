@@ -18,8 +18,6 @@ Rotation.Items = {
 	inventorySlotGloves = ItemBook:GetItem(getItemID(10)),
 	invetorySlotBoots = ItemBook:GetItem(getItemID(8)),
 	manaGem = ItemBook:GetItem(36799),
-	healthstone1 = ItemBook:GetItem(36892),
-	healthstone2 = ItemBook:GetItem(36893),
-	healthstone3 = ItemBook:GetItem(36894),
+	healthstone = ItemBook:GetItem(5512),
 	saroniteBomb = ItemBook:GetItem(41119),
 }
