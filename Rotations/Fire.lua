@@ -127,9 +127,9 @@ local LivingBomb = Caffeine.UnitManager:CreateCustomUnit("livingBomb", function(
 			return false
 		end
 
-		if unit:GetAuras():FindMy(blacklistUnitByAura):IsUp() then
-			return false
-		end
+		--if unit:GetAuras():FindMy(blacklistUnitByAura):IsUp() then
+		--	return false
+		--end
 
 		if unit:GetAuras():FindMy(spells.livingBomb):IsUp() then
 			livingBombCount = livingBombCount + 1
