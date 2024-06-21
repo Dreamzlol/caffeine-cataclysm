@@ -467,7 +467,8 @@ DefaultAPL:AddSpell(spells.flameOrb
 		return self:IsKnownAndUsable()
 			and Target:Exists()
 			and Target:IsHostile()
-			and Player:CanSee(Target)
+            and Player:CanSee(Target)
+			and Player:IsFacing(Target)
 			and Target:CustomIsBoss()
 			and spells.combustion:OnCooldown()
 			and not Player:IsCastingOrChanneling()
@@ -517,7 +518,6 @@ DefaultAPL:AddSpell(spells.dragonsBreath
 		return self:IsKnownAndUsable()
 			and Target:Exists()
 			and Player:CanSee(Target)
-			and Player:GetDistance(Target) <= 8
 			and Player:GetEnemies(8) >= 2
 			and not Player:IsCastingOrChanneling()
 	end)
