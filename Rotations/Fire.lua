@@ -145,6 +145,51 @@ local LivingBomb = Caffeine.UnitManager:CreateCustomUnit("livingBomb", function(
 	return livingBomb
 end)
 
+local Ignite = Caffeine.UnitManager:CreateCustomUnit("ignite", function(unit)
+	local ignite = nil
+
+	Caffeine.UnitManager:EnumEnemies(function(unit)
+		if unit:IsDead() then
+			return false
+		end
+
+		if Player:GetDistance(unit) > 41 then
+			return false
+		end
+
+		if not Player:CanSee(unit) then
+			return false
+		end
+
+		if not unit:IsAffectingCombat() then
+			return false
+		end
+
+		if not unit:IsHostile() then
+			return false
+		end
+
+		if not unit:IsEnemy() then
+			return false
+		end
+
+		if not unit:GetAuras():FindMy(spells.igniteAura):IsUp() then
+			return false
+		end
+
+		if not unit:IsDead() and unit:IsEnemy() and unit:IsHostile() and Player:CanSee(unit) then
+			ignite = unit
+		end
+	end)
+
+	if ignite == nil then
+		ignite = None
+	end
+
+	return ignite
+end)
+
+
 -- Decurse
 local Decurse = Caffeine.UnitManager:CreateCustomUnit("decurse", function(unit)
 	local decurse = nil
@@ -381,17 +426,17 @@ DefaultAPL:AddSpell(spells.livingBomb
 DefaultAPL:AddSpell(spells.fireBlast
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-			and self:IsInRange(Target)
-			and Target:Exists()
-			and Target:IsHostile()
-			and Player:CanSee(Target)
-			and Player:IsFacing(Target)
-			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
+			and self:IsInRange(Ignite)
+			and Ignite:Exists()
+			and Ignite:IsHostile()
+			and Player:CanSee(Ignite)
+			and Player:IsFacing(Ignite)
+			and Ignite:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
-			and Target:GetEnemies(12) >= 2
+			and Ignite:GetEnemies(12) >= 2
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Target)
+	:SetTarget(Ignite)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Spreading Dots)")
 	end))
@@ -408,6 +453,7 @@ DefaultAPL:AddSpell(spells.pyroblast
 			and Target:GetHP() > 95
 			and self:GetTimeSinceLastCast() > 5
 			and not (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+			and not Player:IsMoving()
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target)
@@ -422,7 +468,7 @@ DefaultAPL:AddSpell(spells.flameOrb
 			and Target:Exists()
 			and Target:IsHostile()
 			and Player:CanSee(Target)
-			and (Target:CustomIsBoss() or Target:IsDummy())
+			and Target:CustomIsBoss()
 			and spells.combustion:OnCooldown()
 			and not Player:IsCastingOrChanneling()
 	end)
