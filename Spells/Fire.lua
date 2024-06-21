@@ -36,7 +36,8 @@ Rotation.Spells = {
 	evocation = SpellBook:GetSpell(12051),
 	spellsteal = SpellBook:GetSpell(30449),
 	removeCurse = SpellBook:GetSpell(475),
-	invisibility = SpellBook:GetSpell(66),
+    invisibility = SpellBook:GetSpell(66),
+	blink = SpellBook:GetSpell(1953),
 
 	-- Racials
 	beserking = SpellBook:GetSpell(26297),

@@ -23,6 +23,13 @@ local items = Rotation.Items
 local PreCombatAPL = Caffeine.APL:New("precombat")
 local DefaultAPL = Caffeine.APL:New("default")
 
+local function hotkeys()
+	if IsShiftKeyDown() and spells.blink:IsKnownAndUsable() then
+		spells.blink:ForceCast(None)
+		Caffeine.Notifications:AddNotification(spells.blink:GetIcon(), "Blink (Hotkey)")
+	end
+end
+
 -- NPC Blacklist
 local blacklistUnitById = {
 	[37695] = true, -- Drudge Ghoul: 37695
@@ -467,7 +474,7 @@ DefaultAPL:AddSpell(spells.flameOrb
 		return self:IsKnownAndUsable()
 			and Target:Exists()
 			and Target:IsHostile()
-            and Player:CanSee(Target)
+			and Player:CanSee(Target)
 			and Player:IsFacing(Target)
 			and Target:CustomIsBoss()
 			and spells.combustion:OnCooldown()
@@ -516,8 +523,6 @@ DefaultAPL:AddSpell(spells.spellsteal
 DefaultAPL:AddSpell(spells.dragonsBreath
 	:CastableIf(function(self)
 		return self:IsKnownAndUsable()
-			and Target:Exists()
-			and Player:CanSee(Target)
 			and Player:GetEnemies(8) >= 2
 			and not Player:IsCastingOrChanneling()
 	end)
@@ -674,8 +679,10 @@ Module:Sync(function()
 	-- PreCombatAPL
 	PreCombatAPL:Execute()
 
+
 	-- DefaultAPL
-	if Player:IsAffectingCombat() or Target:IsAffectingCombat() then
+    if Player:IsAffectingCombat() or Target:IsAffectingCombat() then
+		hotkeys()
 		DefaultAPL:Execute()
 	end
 end)
