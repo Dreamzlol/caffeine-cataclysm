@@ -12,12 +12,13 @@ Rotation.Category = Caffeine.Interface.Category:New("|cffffffffDreams|cff00B5FFS
 Rotation.Config = Rotation.Category.config
 
 -- Initialize the Hotbar Toggle too false
-Rotation.Config:Write("autoTarget", false)
+Rotation.Config:Write("aoe", false)
 Rotation.Config:Write("decurse", false)
 Rotation.Config:Write("spellsteal", false)
+Rotation.Config:Write("autoTarget", false)
 
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Mage: Fire (Cataclysm) successfully loaded! Yeeey! :)")
-Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.0")
+Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.1")
 Caffeine:Print(
 	"Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!"
 )
@@ -27,7 +28,7 @@ Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Discord Link: |cffeb6ee9htt
 Hotbar = Caffeine.Interface.Hotbar:New({
 	name = "Dreams|cff00B5FFScripts",
 	options = Rotation.Category,
-	buttonCount = 3,
+	buttonCount = 4,
 })
 
 -- Toggle Rotation
@@ -48,6 +49,27 @@ Hotbar:AddButton({
 		end
 	end,
 })
+
+-- AoE
+Hotbar:AddButton({
+	name = "Toggle AoE",
+	texture = "Interface\\ICONS\\Ability_Mage_LivingBomb",
+	tooltip =
+	"Use AoE Spells (Living Bomb, Blast Wave, Flamestrike, Fire Blast, Flame Orb, Dragon's Breath) on enemies around you.",
+	toggle = true,
+	onClick = function()
+		local getSetting = Rotation.Config:Read("aoe", false)
+		local setting = not getSetting
+		Rotation.Config:Write("aoe", setting)
+
+		if setting then
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - AoE Enabled")
+		else
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - AoE Disabled")
+		end
+	end,
+})
+
 
 -- Remove Decurse
 Hotbar:AddButton({
@@ -143,7 +165,16 @@ Rotation.Category:Checkbox({
 	category = "items",
 	var = "saroniteBomb",
 	name = "Saronite Bomb",
-	tooltip = "Use of Saronite Bomb during combat. Target required.",
+	tooltip = "Use of Saronite Bomb during combat. Target required. (Only Bosses)",
+	default = true,
+	disabled = false,
+})
+
+Rotation.Category:Checkbox({
+	category = "items",
+	var = "volcanicPotion",
+	name = "Volcanic Potion",
+	tooltip = "Use of Volcanic Potion during combat. Target required. (Only Bosses)",
 	default = true,
 	disabled = false,
 })
