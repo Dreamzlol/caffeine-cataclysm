@@ -471,7 +471,7 @@ DefaultAPL:AddSpell(spells.counterspell
 			and Counterspell:Exists()
 			and Counterspell:IsHostile()
 			and Counterspell:CanSee(Player)
-			and Counterspell:IsCastingOrChanneling()
+            and (Counterspell:IsCastingOrChanneling() or Counterspell:IsChanneling())
 			and Counterspell:IsInterruptible()
 	end)
 	:SetTarget(Counterspell)
