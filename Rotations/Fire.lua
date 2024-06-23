@@ -23,7 +23,7 @@ local items = Rotation.Items
 local PreCombatAPL = Caffeine.APL:New("precombat")
 local DefaultAPL = Caffeine.APL:New("default")
 
-local function hotkeys()
+local function RotationHotkeys()
 	if IsShiftKeyDown() and spells.blink:IsKnownAndUsable() then
 		spells.blink:ForceCast(None)
 		Caffeine.Notifications:AddNotification(spells.blink:GetIcon(), "Blink (Hotkey)")
@@ -272,19 +272,24 @@ local Counterspell = Caffeine.UnitManager:CreateCustomUnit("counterspell", funct
 			return false
 		end
 
-		if not unit:IsEnemy() then
-			return false
-		end
-
 		if not unit:IsCastingOrChanneling() then
 			return false
 		end
 
-		if not unit:IsInterruptible() then
+        if not unit:IsInterruptible() then
+            return false
+        end
+
+		-- Maloriak
+		if unit:GetCastingOrChannelingSpell() == spells.releaseAberrations then
 			return false
 		end
 
-		if not unit:IsDead() and unit:IsEnemy() and unit:IsHostile() and Player:CanSee(unit) and unit:IsInterruptible() then
+		if not unit:IsDead()
+			and Player:CanSee(unit)
+			and unit:IsHostile()
+			and unit:IsInterruptible()
+			and unit:IsCastingOrChanneling() then
 			counterspell = unit
 		end
 	end)
@@ -296,6 +301,9 @@ local Counterspell = Caffeine.UnitManager:CreateCustomUnit("counterspell", funct
 	return counterspell
 end)
 
+-- ####################################################################################################
+--                                                Pre-Combat
+-- ####################################################################################################
 -- Molten Armor
 PreCombatAPL:AddSpell(spells.moltenArmor
 	:CastableIf(function(self)
@@ -331,7 +339,9 @@ PreCombatAPL:AddSpell(spells.conjureManaGem
 	end)
 	:SetTarget(Player))
 
--- ################################################## ITEMS ##################################################
+-- ####################################################################################################
+--                                                ITEMS
+-- ####################################################################################################
 -- Healthstone
 DefaultAPL:AddItem(items.healthstone
 	:UsableIf(function(self)
@@ -414,7 +424,10 @@ DefaultAPL:AddItem(items.volcanicPotion
 			and not spells.combustion:OnCooldown()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None))
+	:SetTarget(None)
+	:OnUse(function()
+		Caffeine.Notifications:AddNotification(items.volcanicPotion:GetIcon(), "Volcanic Potion")
+	end))
 
 -- Molten Armor
 DefaultAPL:AddSpell(spells.moltenArmor
@@ -426,7 +439,9 @@ DefaultAPL:AddSpell(spells.moltenArmor
 	end)
 	:SetTarget(Player))
 
--- ################################################## Utilities ##################################################
+-- ####################################################################################################
+--                                            Utilities
+-- ####################################################################################################
 -- Remove Curse
 DefaultAPL:AddSpell(spells.removeCurse
 	:CastableIf(function(self)
@@ -440,6 +455,7 @@ DefaultAPL:AddSpell(spells.removeCurse
 	end)
 	:SetTarget(Decurse)
 	:OnCast(function()
+		SpellStopCasting()
 		Caffeine.Notifications:AddNotification(spells.removeCurse:GetIcon(), "Remove Curse")
 	end))
 
@@ -458,6 +474,7 @@ DefaultAPL:AddSpell(spells.spellsteal
 	end)
 	:SetTarget(Spellsteal)
 	:OnCast(function()
+		SpellStopCasting()
 		Caffeine.Notifications:AddNotification(spells.spellsteal:GetIcon(), "Spellsteal")
 	end))
 
@@ -471,13 +488,14 @@ DefaultAPL:AddSpell(spells.counterspell
 			and Counterspell:Exists()
 			and Counterspell:IsHostile()
 			and Counterspell:CanSee(Player)
-            and (Counterspell:IsCastingOrChanneling() or Counterspell:IsChanneling())
+			and (Counterspell:IsCastingOrChanneling() or Counterspell:IsChanneling())
 			and Counterspell:IsInterruptible()
 	end)
 	:SetTarget(Counterspell)
 	:OnCast(function()
 		SpellStopCasting()
-		Caffeine.Notifications:AddNotification(spells.counterspell:GetIcon(), "Counterspell on " .. Counterspell:GetName())
+		Caffeine.Notifications:AddNotification(spells.counterspell:GetIcon(),
+			"Counterspell on " .. Counterspell:GetName())
 	end))
 
 -- Pyro Blast (Hot Streak)
@@ -492,12 +510,11 @@ DefaultAPL:AddSpell(spells.pyroblast
 			and Player:GetAuras():FindMy(spells.hotStreakAura):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Target)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.pyroblast:GetIcon(), "Pyro Blast (Hot Streak)")
-	end))
+	:SetTarget(Target))
 
--- ################################################## AoE ##################################################
+-- ####################################################################################################
+--                                                AoE
+-- ####################################################################################################
 -- Fire Blast (AoE - Combustion)
 DefaultAPL:AddSpell(spells.fireBlast
 	:CastableIf(function(self)
@@ -514,10 +531,7 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and Ignite:GetEnemies(12) >= 1
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Ignite)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (AoE)")
-	end))
+	:SetTarget(Ignite))
 
 -- Fire Blast (AoE - Pyroblast)
 DefaultAPL:AddSpell(spells.fireBlast
@@ -535,10 +549,7 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and Ignite:GetEnemies(12) >= 1
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Ignite)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (AoE)")
-	end))
+	:SetTarget(Ignite))
 
 -- Fire Blast (AoE - Ignite)
 DefaultAPL:AddSpell(spells.fireBlast
@@ -553,13 +564,10 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and Player:IsFacing(Ignite)
 			and Ignite:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
-			and Ignite:GetEnemies(12) >= 2
+			and Ignite:GetEnemies(12) >= 1
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Ignite)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (AoE)")
-	end))
+	:SetTarget(Ignite))
 
 -- Dragon's Breath
 DefaultAPL:AddSpell(spells.dragonsBreath
@@ -570,10 +578,7 @@ DefaultAPL:AddSpell(spells.dragonsBreath
 			and Player:GetEnemies(8) >= 3
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.dragonsBreath:GetIcon(), "Dragon's Breath (AoE)")
-	end))
+	:SetTarget(None))
 
 -- Flame Orb (AoE)
 DefaultAPL:AddSpell(spells.flameOrb
@@ -588,10 +593,7 @@ DefaultAPL:AddSpell(spells.flameOrb
 			and Target:GetEnemies(12) >= 3
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.flameOrb:GetIcon(), "Flame Orb (AoE)")
-	end))
+	:SetTarget(None))
 
 -- Blast Wave (AoE)
 DefaultAPL:AddSpell(spells.blastWave
@@ -608,7 +610,6 @@ DefaultAPL:AddSpell(spells.blastWave
 	:OnCast(function(self)
 		local position = Target:GetPosition()
 		self:Click(position)
-		Caffeine.Notifications:AddNotification(spells.blastWave:GetIcon(), "Blast Wave (AoE)")
 	end))
 
 -- Flamestrike (AoE)
@@ -629,7 +630,6 @@ DefaultAPL:AddSpell(spells.flamestrike
 	:OnCast(function(self)
 		local position = Target:GetPosition()
 		self:Click(position)
-		Caffeine.Notifications:AddNotification(spells.flamestrike:GetIcon(), "Flamestrike (AoE)")
 	end))
 
 -- Living Bomb (AoE)
@@ -644,12 +644,11 @@ DefaultAPL:AddSpell(spells.livingBomb
 			and LivingBomb:CustomTimeToDie() > 12
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(LivingBomb)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.livingBomb:GetIcon(), "Living Bomb (AoE)")
-	end))
+	:SetTarget(LivingBomb))
 
--- ################################################## Single Target ##################################################
+-- ####################################################################################################
+--                                           Single Target
+-- ####################################################################################################
 -- Mirror Image
 DefaultAPL:AddSpell(spells.mirrorImage
 	:CastableIf(function(self)
@@ -729,10 +728,7 @@ DefaultAPL:AddSpell(spells.flameOrb
 			and spells.combustion:OnCooldown()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(None)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.flameOrb:GetIcon(), "Flame Orb (Boss)")
-	end))
+	:SetTarget(None))
 
 -- Mana Gem
 DefaultAPL:AddItem(items.manaGem
@@ -785,10 +781,7 @@ DefaultAPL:AddSpell(spells.scorch
 			and Player:IsMoving()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Target)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.scorch:GetIcon(), "Scorch (Movement)")
-	end))
+	:SetTarget(Target))
 
 -- Fire Blast (Moving)
 DefaultAPL:AddSpell(spells.fireBlast
@@ -803,21 +796,16 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and not Player:GetAuras():FindMy(spells.impactAura):IsUp()
 			and not Player:IsCastingOrChanneling()
 	end)
-	:SetTarget(Target)
-	:OnCast(function()
-		Caffeine.Notifications:AddNotification(spells.fireBlast:GetIcon(), "Fire Blast (Movement)")
-	end))
+	:SetTarget(Target))
 
 -- Sync
 Module:Sync(function()
-	if
-		Player:IsDead()
+	if Player:IsDead()
 		or IsMounted()
 		or UnitInVehicle("player")
 		or Player:GetAuras():FindAnyOfMy(spells.refreshmentAuras):IsUp()
 		or Player:GetAuras():FindAny(spells.invisibilityAura):IsUp()
-		or blacklistUnitById[Target:GetID()]
-	then
+		or blacklistUnitById[Target:GetID()] then
 		return false
 	end
 
@@ -832,7 +820,7 @@ Module:Sync(function()
 
 	-- DefaultAPL
 	if Player:IsAffectingCombat() or Target:IsAffectingCombat() then
-		hotkeys()
+		RotationHotkeys()
 		DefaultAPL:Execute()
 	end
 end)

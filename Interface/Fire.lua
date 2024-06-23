@@ -15,10 +15,11 @@ Rotation.Config = Rotation.Category.config
 Rotation.Config:Write("aoe", false)
 Rotation.Config:Write("decurse", false)
 Rotation.Config:Write("spellsteal", false)
+Rotation.Config:Write("counterspell", false)
 Rotation.Config:Write("autoTarget", false)
 
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Mage: Fire (Cataclysm) successfully loaded! Yeeey! :)")
-Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.2")
+Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.3")
 Caffeine:Print(
 	"Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!"
 )
@@ -28,7 +29,7 @@ Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Discord Link: |cffeb6ee9htt
 Hotbar = Caffeine.Interface.Hotbar:New({
 	name = "Dreams|cff00B5FFScripts",
 	options = Rotation.Category,
-	buttonCount = 4,
+	buttonCount = 6,
 })
 
 -- Toggle Rotation

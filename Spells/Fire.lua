@@ -36,7 +36,7 @@ Rotation.Spells = {
 	evocation = SpellBook:GetSpell(12051),
 	spellsteal = SpellBook:GetSpell(30449),
 	removeCurse = SpellBook:GetSpell(475),
-    invisibility = SpellBook:GetSpell(66),
+	invisibility = SpellBook:GetSpell(66),
 	blink = SpellBook:GetSpell(1953),
 
 	-- Racials
@@ -54,5 +54,10 @@ Rotation.Spells = {
 	successInvisibilityAura = SpellBook:GetSpell(32612),
 	impactAura = SpellBook:GetSpell(64343),
     arcaneBrillanceAura = SpellBook:GetSpell(79058),
+	
+	-- Living Bomb Blacklist Spells
 	waterspoutAura = SpellBook:GetSpell(75683),
+
+	-- Counterspell Blacklist Spells
+	releaseAberrations = SpellBook:GetSpell(77569)
 }
