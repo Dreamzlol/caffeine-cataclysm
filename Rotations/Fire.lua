@@ -248,6 +248,54 @@ local Spellsteal = Caffeine.UnitManager:CreateCustomUnit("spellsteal", function(
 	return spellsteal
 end)
 
+local Counterspell = Caffeine.UnitManager:CreateCustomUnit("counterspell", function(unit)
+	local counterspell = nil
+
+	Caffeine.UnitManager:EnumEnemies(function(unit)
+		if unit:IsDead() then
+			return false
+		end
+
+		if Player:GetDistance(unit) > 41 then
+			return false
+		end
+
+		if not Player:CanSee(unit) then
+			return false
+		end
+
+		if not unit:IsAffectingCombat() then
+			return false
+		end
+
+		if not unit:IsHostile() then
+			return false
+		end
+
+		if not unit:IsEnemy() then
+			return false
+		end
+
+		if not unit:IsCastingOrChanneling() then
+			return false
+		end
+
+		if not unit:IsInterruptible() then
+			return false
+		end
+
+		if not unit:IsDead() and unit:IsEnemy() and unit:IsHostile() and Player:CanSee(unit) and unit:IsInterruptible() then
+			counterspell = unit
+		end
+	end)
+
+	if counterspell == nil then
+		counterspell = None
+	end
+
+	return counterspell
+end)
+
 -- Molten Armor
 PreCombatAPL:AddSpell(spells.moltenArmor
 	:CastableIf(function(self)
@@ -358,7 +406,7 @@ DefaultAPL:AddItem(items.volcanicPotion
 			and volcanicPotion
 			and Target:Exists()
 			and Target:IsHostile()
-			and Target:CustomIsBoss()
+			and Target:IsBoss()
 			and Player:CanSee(Target)
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
@@ -411,6 +459,25 @@ DefaultAPL:AddSpell(spells.spellsteal
 	:SetTarget(Spellsteal)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.spellsteal:GetIcon(), "Spellsteal")
+	end))
+
+-- Counterspell
+DefaultAPL:AddSpell(spells.counterspell
+	:CastableIf(function(self)
+		local useCounterspell = Rotation.Config:Read("counterspell", true)
+		return self:IsKnownAndUsable()
+			and self:IsInRange(Counterspell)
+			and useCounterspell
+			and Counterspell:Exists()
+			and Counterspell:IsHostile()
+			and Counterspell:CanSee(Player)
+			and Counterspell:IsCastingOrChanneling()
+			and Counterspell:IsInterruptible()
+	end)
+	:SetTarget(Counterspell)
+	:OnCast(function()
+		SpellStopCasting()
+		Caffeine.Notifications:AddNotification(spells.counterspell:GetIcon(), "Counterspell on " .. Counterspell:GetName())
 	end))
 
 -- Pyro Blast (Hot Streak)

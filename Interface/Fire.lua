@@ -18,7 +18,7 @@ Rotation.Config:Write("spellsteal", false)
 Rotation.Config:Write("autoTarget", false)
 
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Mage: Fire (Cataclysm) successfully loaded! Yeeey! :)")
-Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.1")
+Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.2")
 Caffeine:Print(
 	"Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!"
 )
@@ -105,6 +105,25 @@ Hotbar:AddButton({
 			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Spellsteal Enabled")
 		else
 			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Spellsteal Disabled")
+		end
+	end,
+})
+
+-- Counterspell
+Hotbar:AddButton({
+	name = "Toggle Counterspell",
+	texture = "Interface\\ICONS\\Spell_Frost_IceShock",
+	tooltip = "Counterspell enemies when they casting spells.",
+	toggle = true,
+	onClick = function()
+		local getSetting = Rotation.Config:Read("counterspell", false)
+		local setting = not getSetting
+		Rotation.Config:Write("counterspell", setting)
+
+		if setting then
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Counterspell Enabled")
+		else
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Counterspell Disabled")
 		end
 	end,
 })
