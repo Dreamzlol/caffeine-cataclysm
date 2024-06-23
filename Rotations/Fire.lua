@@ -141,6 +141,46 @@ local LivingBomb = Caffeine.UnitManager:CreateCustomUnit("livingBomb", function(
 	return livingBomb
 end)
 
+local AoE = Caffeine.UnitManager:CreateCustomUnit("aoe", function(unit)
+	local aoe = nil
+
+	Caffeine.UnitManager:EnumEnemies(function(unit)
+		if unit:IsDead() then
+			return false
+		end
+
+		if Player:GetDistance(unit) > 41 then
+			return false
+		end
+
+		if not Player:CanSee(unit) then
+			return false
+		end
+
+		if not unit:IsAffectingCombat() then
+			return false
+		end
+
+		if not unit:IsHostile() then
+			return false
+		end
+
+		if not unit:IsEnemy() then
+			return false
+		end
+
+		if not unit:IsDead() and unit:IsEnemy() and unit:IsHostile() and Player:CanSee(unit) then
+			aoe = unit
+		end
+	end)
+
+	if aoe == nil then
+		aoe = None
+	end
+
+	return aoe
+end)
+
 local Ignite = Caffeine.UnitManager:CreateCustomUnit("ignite", function(unit)
 	local ignite = nil
 
@@ -184,7 +224,6 @@ local Ignite = Caffeine.UnitManager:CreateCustomUnit("ignite", function(unit)
 
 	return ignite
 end)
-
 
 -- Decurse
 local Decurse = Caffeine.UnitManager:CreateCustomUnit("decurse", function(unit)
@@ -276,9 +315,9 @@ local Counterspell = Caffeine.UnitManager:CreateCustomUnit("counterspell", funct
 			return false
 		end
 
-        if not unit:IsInterruptible() then
-            return false
-        end
+		if not unit:IsInterruptible() then
+			return false
+		end
 
 		-- Maloriak
 		if unit:GetCastingOrChannelingSpell() == spells.releaseAberrations then
@@ -590,7 +629,7 @@ DefaultAPL:AddSpell(spells.flameOrb
 			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and Player:IsFacing(Target)
-			and Target:GetEnemies(12) >= 3
+			and Target:GetEnemies(30) >= 4
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(None))
@@ -601,14 +640,15 @@ DefaultAPL:AddSpell(spells.blastWave
 		local useAoE = Rotation.Config:Read("aoe", true)
 		return useAoE
 			and self:IsKnownAndUsable()
-			and Target:Exists()
-			and Player:GetDistance(Target) <= 36
-			and Target:GetEnemies(12) >= 2
+			and AoE:Exists()
+			and AoE:IsHostile()
+			and Player:CanSee(AoE)
+			and AoE:GetEnemies(12) >= 2
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(None)
 	:OnCast(function(self)
-		local position = Target:GetPosition()
+		local position = Caffeine.UnitManager:FindEnemiesCentroid(12, 40)
 		self:Click(position)
 	end))
 
@@ -618,17 +658,16 @@ DefaultAPL:AddSpell(spells.flamestrike
 		local useAoE = Rotation.Config:Read("aoe", true)
 		return useAoE
 			and self:IsKnownAndUsable()
-			and Target:Exists()
-			and Target:IsHostile()
-			and Player:CanSee(Target)
-			and Target:GetEnemies(12) >= 2
-			and Player:GetDistance(Target) <= 36
+			and AoE:Exists()
+			and AoE:IsHostile()
+			and Player:CanSee(AoE)
+			and AoE:GetEnemies(12) >= 2
 			and spells.flamestrike:GetTimeSinceLastCast() > 8
 			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(None)
 	:OnCast(function(self)
-		local position = Target:GetPosition()
+		local position = Caffeine.UnitManager:FindEnemiesCentroid(12, 40)
 		self:Click(position)
 	end))
 
@@ -641,6 +680,7 @@ DefaultAPL:AddSpell(spells.livingBomb
 			and self:IsInRange(LivingBomb)
 			and LivingBomb:Exists()
 			and LivingBomb:IsHostile()
+			and Player:CanSee(LivingBomb)
 			and LivingBomb:CustomTimeToDie() > 12
 			and not Player:IsCastingOrChanneling()
 	end)

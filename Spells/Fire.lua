@@ -53,8 +53,8 @@ Rotation.Spells = {
 	invisibilityAura = SpellBook:GetSpell(66),
 	successInvisibilityAura = SpellBook:GetSpell(32612),
 	impactAura = SpellBook:GetSpell(64343),
-    arcaneBrillanceAura = SpellBook:GetSpell(79058),
-	
+	arcaneBrillanceAura = SpellBook:GetSpell(79058),
+
 	-- Living Bomb Blacklist Spells
 	waterspoutAura = SpellBook:GetSpell(75683),
 
