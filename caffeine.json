@@ -1,9 +1,9 @@
 {
   "order": [
-    "Helper/Helper.lua",
-    "Interface/Fire.lua",
-    "Spells/Fire.lua",
-    "Items/Fire.lua",
-    "Rotations/Fire.lua"
+    "Helper/Helper",
+    "Interface/Fire",
+    "Spells/Fire",
+    "Items/Fire",
+    "Rotations/Fire"
   ]
 }
