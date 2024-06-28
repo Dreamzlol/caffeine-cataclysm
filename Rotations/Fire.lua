@@ -648,7 +648,7 @@ DefaultAPL:AddSpell(spells.blastWave
 	end)
 	:SetTarget(None)
 	:OnCast(function(self)
-		local position = Caffeine.UnitManager:FindEnemiesCentroid(12, 40)
+		local position = AoE:GetPosition()
 		self:Click(position)
 	end))
 
@@ -667,7 +667,7 @@ DefaultAPL:AddSpell(spells.flamestrike
 	end)
 	:SetTarget(None)
 	:OnCast(function(self)
-		local position = Caffeine.UnitManager:FindEnemiesCentroid(12, 40)
+		local position = AoE:GetPosition()
 		self:Click(position)
 	end))
 
