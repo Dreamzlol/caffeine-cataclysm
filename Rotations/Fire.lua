@@ -704,8 +704,10 @@ DefaultAPL:AddSpell(spells.mirrorImage
 
 -- Combustion (Auras)
 DefaultAPL:AddSpell(spells.combustion
-	:CastableIf(function(self)
-		return self:IsKnownAndUsable()
+    :CastableIf(function(self)
+		local useCombustion = Rotation.Config:Read("combustion", false)
+		return useCombustion
+			and self:IsKnownAndUsable()
 			and self:IsInRange(Target)
 			and Target:Exists()
 			and Target:IsHostile()
