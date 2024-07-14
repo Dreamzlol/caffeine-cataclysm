@@ -20,7 +20,7 @@ Rotation.Config:Write("combustion", false)
 Rotation.Config:Write("autoTarget", false)
 
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Mage: Fire (Cataclysm) successfully loaded! Yeeey! :)")
-Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.9")
+Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.3.0")
 Caffeine:Print(
 	"Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!"
 )

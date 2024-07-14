@@ -32,7 +32,7 @@ end
 
 -- NPC Blacklist
 local blacklistUnitById = {
-	[37695] = true, -- Drudge Ghoul: 37695
+	[41806] = true, -- Lava Parasite
 }
 
 local HighestHPEnemie = Caffeine.UnitManager:CreateCustomUnit("highest", function(unit)
@@ -779,7 +779,7 @@ DefaultAPL:AddSpell(spells.mirrorImage
 -- Combustion (Auras)
 local combustionThresholdReached = false
 DefaultAPL:AddSpell(spells.combustion
-    :CastableIf(function(self)
+	:CastableIf(function(self)
 		local holdCombustion = Rotation.Config:Read("combustion", true)
 		if holdCombustion then
 			return false
