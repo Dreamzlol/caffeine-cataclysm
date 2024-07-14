@@ -779,7 +779,11 @@ DefaultAPL:AddSpell(spells.mirrorImage
 -- Combustion (Auras)
 local combustionThresholdReached = false
 DefaultAPL:AddSpell(spells.combustion
-	:CastableIf(function(self)
+    :CastableIf(function(self)
+		local holdCombustion = Rotation.Config:Read("combustion", true)
+		if holdCombustion then
+			return false
+		end
 		local combustionThreshold = Rotation.Config:Read("spells_combustionThreshold", 15000)
 		local igniteHighEnough = isIgniteTickingHigh(Target:GetGUID(), combustionThreshold)
 
