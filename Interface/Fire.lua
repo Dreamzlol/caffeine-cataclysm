@@ -16,10 +16,11 @@ Rotation.Config:Write("aoe", false)
 Rotation.Config:Write("decurse", false)
 Rotation.Config:Write("spellsteal", false)
 Rotation.Config:Write("counterspell", false)
+Rotation.Config:Write("combustion", false)
 Rotation.Config:Write("autoTarget", false)
 
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Mage: Fire (Cataclysm) successfully loaded! Yeeey! :)")
-Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.7")
+Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.8")
 Caffeine:Print(
 	"Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!"
 )
@@ -125,6 +126,25 @@ Hotbar:AddButton({
 			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Counterspell Enabled")
 		else
 			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Counterspell Disabled")
+		end
+	end,
+})
+
+-- Hold Combustion
+Hotbar:AddButton({
+	name = "Toggle Hold Combustion",
+	texture = "Interface\\ICONS\\Spell_Fire_SealOfFire",
+	tooltip = "Hold of Combustion as long as this Toggle is on. If you turn it off, it will return to functioning normally within the threshold you've set.",
+	toggle = true,
+	onClick = function()
+		local getSetting = Rotation.Config:Read("combustion", false)
+		local setting = not getSetting
+		Rotation.Config:Write("combustion", setting)
+
+		if setting then
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Hold Combustion Enabled")
+		else
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Hold Combustion Disabled")
 		end
 	end,
 })

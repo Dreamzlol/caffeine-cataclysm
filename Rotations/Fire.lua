@@ -780,7 +780,7 @@ DefaultAPL:AddSpell(spells.mirrorImage
 local combustionThresholdReached = false
 DefaultAPL:AddSpell(spells.combustion
 	:CastableIf(function(self)
-		local combustionThreshold = Rotation.Config:Read("combustionThreshold", 15000)
+		local combustionThreshold = Rotation.Config:Read("spells_combustionThreshold", 15000)
 		local igniteHighEnough = isIgniteTickingHigh(Target:GetGUID(), combustionThreshold)
 
 		if igniteHighEnough and not combustionThresholdReached then
