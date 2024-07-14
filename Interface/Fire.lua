@@ -150,15 +150,6 @@ Hotbar:AddButton({
 
 -- Items
 Rotation.Category:AddSubsection("|cffFFFFFFSpells")
-Rotation.Category:Checkbox({
-	category = "spells",
-	var = "combustion",
-	name = "Use Combustion manually",
-	tooltip = "Use Combustion manually. Rest like Spreading remain Automatically.",
-	default = false,
-	disabled = false,
-})
-
 Rotation.Category:Slider({
 	category = "spells",
 	var = "combustionThreshold",
