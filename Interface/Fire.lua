@@ -19,7 +19,7 @@ Rotation.Config:Write("counterspell", false)
 Rotation.Config:Write("autoTarget", false)
 
 Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Mage: Fire (Cataclysm) successfully loaded! Yeeey! :)")
-Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.6")
+Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Current Version: 1.2.7")
 Caffeine:Print(
 	"Dreams|cff00B5FFScripts |cffFFFFFF - Need assistance or want to share feedback? Join our Discord community!"
 )
@@ -154,9 +154,20 @@ Rotation.Category:Checkbox({
 	category = "spells",
 	var = "combustion",
 	name = "Use Combustion manually",
-	tooltip = "Use of Combustion manually. Rest like Spreading remain Automatically.",
+	tooltip = "Use Combustion manually. Rest like Spreading remain Automatically.",
 	default = false,
 	disabled = false,
+})
+
+Rotation.Category:Slider({
+	category = "spells",
+	var = "combustionThreshold",
+	name = "Combustion Threshold (Ignite)",
+	tooltip = "Use Combustion automatically when the target has an Ignite Tick higher than the chosen threshold.",
+	default = 15000,
+	min = 0,
+	max = 100000,
+	step = 500,
 })
 
 Rotation.Category:AddSubsection("|cffFFFFFFItems")

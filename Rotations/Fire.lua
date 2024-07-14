@@ -340,6 +340,81 @@ local Counterspell = Caffeine.UnitManager:CreateCustomUnit("counterspell", funct
 	return counterspell
 end)
 
+
+local igniteValues = {}
+local igniteSpells = {
+	[2136] = true, -- Fire Blast
+	[133] = true, -- Fireball
+	[44614] = true, -- Frostfire Bolt
+	[2948] = true, -- Scorch
+	[92315] = true, -- Pyroblast
+	[11366] = true, -- Pyroblast, Hard-Cast
+	[2120] = true, -- Flamestrike
+	[31661] = true, -- Dragon's Breath
+	[11113] = true, -- Blast Wave
+	[84721] = true, -- Frozen Orb
+}
+
+local function getMastery()
+	return IsPlayerSpell(44457) and (1 + (2.8 * GetMastery()) / 100) or 1
+end
+
+local function updateIgnite(guid, amount, isCrit, spellId)
+	if not (isCrit and igniteSpells[spellId]) then return end
+
+	local masteryMultiplier = getMastery()
+	local igniteAmount = math.floor(amount * 0.4 * masteryMultiplier + 0.5)
+
+	if not igniteValues[guid] then
+		igniteValues[guid] = { total = igniteAmount, tickDamage = 0, ticksRemaining = 2 }
+	else
+		igniteValues[guid].total = igniteValues[guid].total + igniteAmount
+		igniteValues[guid].ticksRemaining = 3
+	end
+
+	igniteValues[guid].tickDamage = math.floor(igniteValues[guid].total / igniteValues[guid].ticksRemaining + 0.5)
+end
+
+local function adjustIgnite(guid, amount)
+	local ignite = igniteValues[guid]
+	if not ignite then return end
+
+	ignite.total = math.max(0, ignite.total - amount)
+	ignite.ticksRemaining = math.max(0, ignite.ticksRemaining - 1)
+	ignite.tickDamage = ignite.ticksRemaining > 0 and math.floor(ignite.total / ignite.ticksRemaining + 0.5) or 0
+end
+
+local function isIgniteTickingHigh(targetGUID, threshold)
+	threshold = threshold or 15000
+	local ignite = igniteValues[targetGUID]
+
+	if not ignite then
+		return false
+	end
+
+	local isHigh = ignite.tickDamage > threshold
+
+	return isHigh
+end
+
+local playerGUID = UnitGUID("player")
+local igniteSpellId = 12654
+
+local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+eventFrame:SetScript("OnEvent", function(self, event)
+	local _, subevent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId, _, _, amount, _, _, _, _, _, critical =
+		CombatLogGetCurrentEventInfo()
+
+	if sourceGUID ~= playerGUID then return end
+
+	if subevent == "SPELL_DAMAGE" then
+		updateIgnite(destGUID, amount, critical, spellId)
+	elseif subevent == "SPELL_PERIODIC_DAMAGE" and spellId == igniteSpellId then
+		adjustIgnite(destGUID, amount)
+	end
+end)
+
 -- ####################################################################################################
 --                                                Pre-Combat
 -- ####################################################################################################
@@ -547,7 +622,6 @@ DefaultAPL:AddSpell(spells.pyroblast
 			and Player:CanSee(Target)
 			and Player:IsFacing(Target)
 			and Player:GetAuras():FindMy(spells.hotStreakAura):IsUp()
-			and not Player:IsCastingOrChanneling()
 	end)
 	:SetTarget(Target))
 
@@ -703,16 +777,24 @@ DefaultAPL:AddSpell(spells.mirrorImage
 	:SetTarget(None))
 
 -- Combustion (Auras)
+local combustionThresholdReached = false
 DefaultAPL:AddSpell(spells.combustion
-    :CastableIf(function(self)
-		local useCombustion = Rotation.Config:Read("combustion", false)
-		return useCombustion
-			and self:IsKnownAndUsable()
+	:CastableIf(function(self)
+		local combustionThreshold = Rotation.Config:Read("combustionThreshold", 15000)
+		local igniteHighEnough = isIgniteTickingHigh(Target:GetGUID(), combustionThreshold)
+
+		if igniteHighEnough and not combustionThresholdReached then
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Combustion Threshold Reached: " .. combustionThreshold)
+			combustionThresholdReached = true
+		end
+
+		return self:IsKnownAndUsable()
 			and self:IsInRange(Target)
 			and Target:Exists()
 			and Target:IsHostile()
 			and Player:CanSee(Target)
 			and Target:CustomIsBoss()
+			and igniteHighEnough
 			and Target:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Target:GetAuras():FindMy(spells.livingBomb):IsUp()
 			and (Target:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Target:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
@@ -721,7 +803,9 @@ DefaultAPL:AddSpell(spells.combustion
 	:SetTarget(Target)
 	:OnCast(function()
 		Caffeine.Notifications:AddNotification(spells.combustion:GetIcon(), "Combustion")
-	end))
+		combustionThresholdReached = false
+	end)
+)
 
 -- Pyro Blast (Opener)
 DefaultAPL:AddSpell(spells.pyroblast
