@@ -209,10 +209,6 @@ local Ignite = Caffeine.UnitManager:CreateCustomUnit("ignite", function(unit)
 			return false
 		end
 
-		if not unit:GetAuras():FindMy(spells.igniteAura):IsUp() then
-			return false
-		end
-
 		if not unit:IsDead() and unit:IsEnemy() and unit:IsHostile() and Player:CanSee(unit) then
 			ignite = unit
 		end
@@ -657,7 +653,8 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and Ignite:IsHostile()
 			and Player:CanSee(Ignite)
 			and Player:IsFacing(Ignite)
-			and (Ignite:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Ignite:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+            and (Ignite:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Ignite:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+			and Ignite:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
 			and Ignite:GetEnemies(12) >= 1
 			and not Player:IsCastingOrChanneling()
