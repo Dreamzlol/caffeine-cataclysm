@@ -337,79 +337,68 @@ local Counterspell = Caffeine.UnitManager:CreateCustomUnit("counterspell", funct
 end)
 
 
-local igniteValues = {}
-local igniteSpells = {
-	[2136] = true, -- Fire Blast
-	[133] = true, -- Fireball
-	[44614] = true, -- Frostfire Bolt
-	[2948] = true, -- Scorch
-	[92315] = true, -- Pyroblast
-	[11366] = true, -- Pyroblast, Hard-Cast
-	[2120] = true, -- Flamestrike
-	[31661] = true, -- Dragon's Breath
-	[11113] = true, -- Blast Wave
-	[84721] = true, -- Frozen Orb
-}
+-- Tracking Ignite
+local IgniteSpellId = 413841 -- Spell ID for Ignite application
+local IgniteTickId = 413843  -- Spell ID for Ignite Tick
 
-local function getMastery()
-	return IsPlayerSpell(44457) and (1 + (2.8 * GetMastery()) / 100) or 1
-end
+-- Table to store Ignite data for each target
+local IgniteData = {}
 
-local function updateIgnite(guid, amount, isCrit, spellId)
-	if not (isCrit and igniteSpells[spellId]) then return end
-
-	local masteryMultiplier = getMastery()
-	local igniteAmount = math.floor(amount * 0.4 * masteryMultiplier + 0.5)
-
-	if not igniteValues[guid] then
-		igniteValues[guid] = { total = igniteAmount, tickDamage = 0, ticksRemaining = 2 }
+-- Function to handle Ignite application
+local function OnIgniteApplied(destGuid, timestamp)
+	if not IgniteData[destGuid] then
+		IgniteData[destGuid] = {
+			totalDamage = 0,
+			ticks = {},
+			startTime = timestamp,
+			lastTickDamage = 0 -- Initialize the last tick damage
+		}
 	else
-		igniteValues[guid].total = igniteValues[guid].total + igniteAmount
-		igniteValues[guid].ticksRemaining = 3
+		-- Refresh existing Ignite data if already present
+		IgniteData[destGuid].startTime = timestamp
 	end
-
-	igniteValues[guid].tickDamage = math.floor(igniteValues[guid].total / igniteValues[guid].ticksRemaining + 0.5)
 end
 
-local function adjustIgnite(guid, amount)
-	local ignite = igniteValues[guid]
-	if not ignite then return end
-
-	ignite.total = math.max(0, ignite.total - amount)
-	ignite.ticksRemaining = math.max(0, ignite.ticksRemaining - 1)
-	ignite.tickDamage = ignite.ticksRemaining > 0 and math.floor(ignite.total / ignite.ticksRemaining + 0.5) or 0
-end
-
-local function isIgniteTickingHigh(targetGUID, threshold)
-	threshold = threshold or 15000
-	local ignite = igniteValues[targetGUID]
-
-	if not ignite then
-		return false
+-- Function to handle Ignite ticks
+local function OnIgniteTick(destGuid, damage, timestamp)
+	if IgniteData[destGuid] then
+		table.insert(IgniteData[destGuid].ticks, { damage = damage, time = timestamp })
+		IgniteData[destGuid].totalDamage = IgniteData[destGuid].totalDamage + damage
+		IgniteData[destGuid].lastTickDamage = damage -- Update the last tick damage
 	end
-
-	local isHigh = ignite.tickDamage > threshold
-
-	return isHigh
 end
-
-local playerGUID = UnitGUID("player")
-local igniteSpellId = 12654
 
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 eventFrame:SetScript("OnEvent", function(self, event)
-	local _, subevent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId, _, _, amount, _, _, _, _, _, critical =
+	local timeStamp, subEvent, _, sourceGUID, sourceName, _, _, destGUID, destName, _, _, spellId, spellName, spellSchool, amount, _, _, _, _, _, critical =
 		CombatLogGetCurrentEventInfo()
 
-	if sourceGUID ~= playerGUID then return end
-
-	if subevent == "SPELL_DAMAGE" then
-		updateIgnite(destGUID, amount, critical, spellId)
-	elseif subevent == "SPELL_PERIODIC_DAMAGE" and spellId == igniteSpellId then
-		adjustIgnite(destGUID, amount)
+	if sourceName == UnitName("player") then
+		if subEvent == "SPELL_DAMAGE" and spellId == IgniteTickId then
+			-- Process Ignite tick damage
+			OnIgniteTick(destGUID, amount, timeStamp)
+		elseif (subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH") and spellId == IgniteSpellId then
+			-- Process Ignite application
+			OnIgniteApplied(destGUID, timeStamp)
+		elseif subEvent == "SPELL_PERIODIC_DAMAGE" and spellId == IgniteTickId then
+			-- Process periodic Ignite tick damage
+			OnIgniteTick(destGUID, amount, timeStamp)
+		elseif subEvent == "SPELL_AURA_REMOVED" and spellId == IgniteSpellId then
+			-- Optional: Clean up data if Ignite is removed
+			IgniteData[destGUID] = nil
+		end
 	end
 end)
+
+-- Function to get the last Ignite tick damage for a target
+local function GetLastIgniteTickDamage(destGuid)
+	if IgniteData[destGuid] then
+		return IgniteData[destGuid].lastTickDamage
+	else
+		return 0
+	end
+end
 
 -- ####################################################################################################
 --                                                Pre-Combat
@@ -653,7 +642,7 @@ DefaultAPL:AddSpell(spells.fireBlast
 			and Ignite:IsHostile()
 			and Player:CanSee(Ignite)
 			and Player:IsFacing(Ignite)
-            and (Ignite:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Ignite:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
+			and (Ignite:GetAuras():FindMy(spells.pyroblastAura):IsUp() or Ignite:GetAuras():FindMy(spells.pyroblastAura2):IsUp())
 			and Ignite:GetAuras():FindMy(spells.igniteAura):IsUp()
 			and Player:GetAuras():FindMy(spells.impactAura):IsUp()
 			and Ignite:GetEnemies(12) >= 1
@@ -782,10 +771,11 @@ DefaultAPL:AddSpell(spells.combustion
 			return false
 		end
 		local combustionThreshold = Rotation.Config:Read("spells_combustionThreshold", 15000)
-		local igniteHighEnough = isIgniteTickingHigh(Target:GetGUID(), combustionThreshold)
+		local lastIgniteTick = GetLastIgniteTickDamage(Target:GetGUID())
+		local igniteHighEnough = lastIgniteTick >= combustionThreshold
 
 		if igniteHighEnough and not combustionThresholdReached then
-			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Combustion Threshold Reached: " .. combustionThreshold)
+			Caffeine:Print("Dreams|cff00B5FFScripts |cffFFFFFF - Combustion Threshold Reached: " .. lastIgniteTick)
 			combustionThresholdReached = true
 		end
 
